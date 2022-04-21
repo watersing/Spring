@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <!-- 1.创建spring控制的资源 (ioc容器)
+              1). id 是这个bean的标识, 可以自定义,但是最好见名知意
+              2). class 指定实现类的全限定名
+      -->
+    <!--<bean id="userService" class="com.itheima.service.impl.UserServiceImpl"/>-->
+
+    <!--
+        TODO: bean标签其他属性
+        1. name : 作用等同于id,也是bean的标识
+            1). 这样,一个bean就可以有多个标识
+            2). 作用: 用于多人协同开发
+        2. scope : 作用域
+            1). singleton : 单例 (默认值 !!!)
+                这个bean在容器独一份
+            2). prototype : 原型(多例)
+                这个bean不在容器中,每获取一次,工厂帮我们创建一次
+
+            补充: bean创建的时机
+                0. 一个bean创建,默认执行空参构造
+                1. 单例的bean : 工厂加载配置文件时就创建了 (饿汉单例)
+                2. 多例的bean : 工厂加载配置文件时不创建,获取的时候,每获取一次创建一次 (懒汉多例)
+        3. 生命周期
+            1). init-method : 指定初始化方法
+                I. 运行时机: 对象创建时执行,就执行一次
+                II. 单例: 工厂加载配置文件时就创建了,所以此方法就运行了
+                III. 原型: 获取对象时执行,每获取一次,就执行一次
+            2). destroy-method : 指定销毁方法
+                I. 运行时机: 对象销毁时执行,就执行一次
+                II. 单例: 工厂销毁,容器就会销毁, 容器中的bean就会执行此方法
+                III. 原型: 是不会执行销毁方法的,原因是原型的bean不放在容器中
+
+            底层的反射:
+               Class clazz =  Class.forName("com.itheima.service.impl.UserServiceImpl");
+               Object object = clazz.newInstance();
+               Method method = clazz.getMethod("init");
+               method.invoke(object);
+    -->
+    <bean id="userService" class="com.itheima.service.impl.UserServiceImpl"
+          name="userService2,userService3"
+          scope="prototype"
+          init-method="init"
+          destroy-method="destroy"
+    />
+
+    <!--
+
+        将StaticFactory类的getBean方法的返回值配置到ioc容器中
+
+        # 工厂方式配置bean
+        1. 工厂模式: 为了创建对象
+            1). 静态工厂
+                方法是静态的(依赖类调用,与对象无关)
+            2). 实例工厂
+                方法是非静态的 (依赖对象调用)
+
+        2. 使用场景: 如果一个类没有类名, 那么只能使用硬编码方式配置到ioc容器中
+            1). 匿名内部类
+            2). 动态代理的代理类
+        3. 原理: (反射)
+               Class clazz =  Class.forName("com.itheima.factory.StaticFactory");
+               Method method = clazz.getMethod("getBean");
+               Object object = method.invoke(null); // UserService类型
+               iocMap.put("userService5",object);
+    -->
+    <bean id="userService5" class="com.itheima.factory.StaticFactory"
+          factory-method="getBean"/>
+
+    <!--
+            //先创建工厂类的实例
+                Class clazz =  Class.forName("com.itheima.factory.InstanceFactory");
+                Object instanceFactory = clazz.newInstance();
+                iocMap.put("instanceFactory",instanceFactory);
+           //然后调用非静态方法创建UserService的实例
+                Object instanceFactory = iocMap.get("instanceFactory");
+                Class clazz = instanceFactory.getClass();
+               Method method = clazz.getMethod("getBean");
+               Object object = method.invoke(instanceFactory); // UserService类型
+               iocMap.put("userService6",object);
+    -->
+    <bean id="instanceFactory" class="com.itheima.factory.InstanceFactory"/>
+    <bean id="userService6" factory-bean="instanceFactory" factory-method="getBean" />
+
+    <!--
+        TODO: set注入
+        1. 底层原理:
+                开发者编写的配置
+                    <property name="name" value="zs"/>
+                spring底层解析
+                    name="name"
+                    value="zs"
+
+              Class clazz =  Class.forName("com.itheima.service.impl.UserServiceImpl2");
+             Object obj = clazz.newInstance();
+             /*
+                方法名: setName
+                    根据property.name推导得出的
+                参数列表 : String.class
+                    参考名为name的属性的类型
+             */
+             Method setName = clazz.getMethod("setName",String.class);
+             /*
+                等价于 obj.setName("zs");
+                    zs是通过property.value得到的
+             */
+             setName.invoke(obj,"zs");
+
+        2. 语法
+            1). value   -> 适用于基本类型和String
+            2). ref -> 适用于引用类型
+                reference(引用) : 从ioc容器中获取对应的bean
+
+    -->
+    <bean id="userDao" class="com.itheima.dao.impl.UserDaoImpl"/>
+    <bean id="userService7" class="com.itheima.service.impl.UserServiceImpl2">
+        <property name="name" value="zs"/>
+        <property name="age" value="18"/>
+        <property name="dao" ref="userDao"/>
+    </bean>
+
+    <!--
+        构造器注入(了解)
+          Class clazz =  Class.forName("com.itheima.service.impl.UserServiceImpl3");
+          Constructor constructor = clazz.getConstructor(String.class,Integer.class,UserDao.class);
+          Object obj = constructor.newInstance("ls",19,userDao);
+    -->
+    <bean id="userService8" class="com.itheima.service.impl.UserServiceImpl3">
+        <constructor-arg name="name" value="ls"/>
+        <constructor-arg name="age" value="19"/>
+        <constructor-arg name="dao" ref="userDao"/>
+    </bean>
+
+    <!--
+        集合类型属性注入
+    -->
+    <bean id="userService9" class="com.itheima.service.impl.UserServiceImpl4">
+        <property name="list">
+            <list>
+                <value>zs</value>
+                <value>ls</value>
+                <value>ww</value>
+            </list>
+        </property>
+        <property name="p">
+            <props>
+                <prop key="username">admin</prop>
+                <prop key="password">123</prop>
+            </props>
+        </property>
+        <property name="array">
+            <array>
+                <value>100</value>
+                <value>200</value>
+            </array>
+        </property>
+        <property name="set">
+            <set>
+                <value>ml</value>
+                <value>qq</value>
+            </set>
+        </property>
+        <property name="map">
+            <map>
+                <entry key="name" value="zhangsan"/>
+                <entry key="age" value="18"/>
+            </map>
+        </property>
+    </bean>
+
+    <!--
+        spring的el表达式
+        1. #{} 强调的是把内容赋值给属性
+            1). 如果是基本类型或String,那么直接写常量即可, 字符串需要''
+            2). 如果是ioc容器中的对象,直接写变量名即可
+            3). 好处
+                I. 不需要考虑用value还是ref,统一都用value即可
+                II. 支持计算的
+
+        2. ${} 用于加载外部文件指定的Key值
+    -->
+    <context:property-placeholder location="classpath:data.properties"/>
+    <bean id="userService10" class="com.itheima.service.impl.UserServiceImpl5">
+     <!--   <property name="name" value="#{'ww'}"/>
+        <property name="age" value="#{19}"/>-->
+        <property name="name" value="${jdbc.name}"/>
+        <property name="age" value="${jdbc.age}"/>
+        <property name="dao" value="#{userDao}"/>
+    </bean>
+</beans>
