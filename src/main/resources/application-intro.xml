@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+  <!-- 1.创建spring控制的资源
+            1). id 是这个bean的标识, 可以自定义,但是最好见名知意
+            2). class 指定实现类的全限定名
+    -->
+      <!--加入在团队开发中，不同的程序员对bean的名称又不同的命名习惯，如果为一个bean取多个名字（别名）
+                解决方案：使用name属性为bean取别名，名称之间使用逗号间隔
+        -->
+    <!--    <bean id="userService" name="userService2,userService3" class="com.itheima.service.impl.UserServiceImpl"/>-->
+
+        <!--
+            spring中bean默认是：单例
+                在spring中单例指的不是一种类型的bean在容器中只有一个，而是一个名称对应的bean只有一个！！
+        -->
+        <!--
+            scope:作用域
+                singleton：单例，指的是某个名称对应的bean最多只能有一个（而不是指的类型对应的bean只有一个）；
+                prototype:原型（多例-构建多个示例的bean对象的模板都使用了同一个class），多例
+        -->
+   <!--  <bean id="userService" class="com.itheima.service.impl.UserServiceImpl"/> -->
+
+   <!--  <bean id="userService" name = "userService2,userService3" class="com.itheima.service.impl.UserServiceImpl"/>
+     -->
+
+    <bean id="userService" scope="singleton" class="com.itheima.service.impl.UserServiceImpl"/>
+
+    <bean id="userService2" scope="prototype"  class="com.itheima.service.impl.UserServiceImpl"/>
+
+
+</beans>

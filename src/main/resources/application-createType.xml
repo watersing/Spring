@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--配置静态工厂-->
+    <!--
+        说明：
+            class:指定静态工厂的类的全限定名称
+            factory-method：指定工厂生产对象的静态方法
+            id：userService名称是静态工厂调用createBean方法生产的bean对象的名称
+       底层会调用静态工厂下的方法产生bean对象，并存入ioc容器中，而静态工厂是无需作为一个bean被ioc容器管理的；
+    -->
+  <bean id="userService" class="com.itheima.factory.StaticFactory" factory-method="createBean"/>
+
+    <!--
+        实例工厂的配置方式：
+            1.先配置好实例工厂的bean对象
+            2.调用实例工厂的方法生成对象，并被ioc容器管理
+        注意事项：
+             工厂bean对象和工厂生产的bean对象都被ioc容器管理
+    -->
+    <!--1.配置实例工厂-->
+   <!--  <bean id="instanceFactory" class="com.itheima.factory.InstanceFactory"/> -->
+    <!--2.调用实例工厂的方法生成对象，并被ioc容器管理-->
+    <!--
+        说明：
+            factory-bean：指定工厂bean的id，说白了就是引用工厂bean对象
+            factory-method：指定引用的工厂bean生产对象的方法
+    -->
+  <!--   <bean id="userService" factory-bean="instanceFactory" factory-method="createBean"/> -->
+
+
+
+</beans>

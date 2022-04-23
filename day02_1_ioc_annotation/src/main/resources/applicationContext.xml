@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+<!-- 注解 :注解启动时使用注解的形式替代xml配置，将繁杂的spring配置文件从工程中彻底消除掉，简化书写 -->
+<!-- component:组成,组件 -->
+<!-- - 说明：
+       - 在进行包扫描时，会对配置的包及其子包中所有文件进行扫描
+       - 扫描过程是以文件夹递归迭代的形式进行的
+       - 扫描过程仅读取合法的java文件
+       - 扫描时仅读取spring可识别的注解
+       - 扫描结束后会将可识别的有效注解转化为spring对应的资源加入IoC容器
+     - 注意：
+       - 无论是注解格式还是XML配置格式，最终都是将资源加载到IoC容器中，差别仅仅是数据读取方式不同
+       - 从加载效率上来说注解优于XML配置文件
+ -->
+
+       <!--  <context:component-scan base-package="com.itheima"/> -->
+       <bean id="userService" class="com.itheima.service.impl.UserServiceImpl"/>
+
+       <bean id="userDao" class="com.itheima.dao.impl.UserDaoImpl"/>
+
+       <bean id="bookDao" class="com.itheima.dao.impl.BookDaoImpl"/>
+
+        </beans>
